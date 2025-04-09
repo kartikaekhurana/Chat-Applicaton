@@ -16,6 +16,7 @@ export default function Register() {
     draggable: true,
     theme: "dark",
   };
+
   const [values, setValues] = useState({
     username: "",
     email: "",
@@ -29,29 +30,21 @@ export default function Register() {
     }
   }, []);
 
-  const handleChange = (event) => {
-    setValues({ ...values, [event.target.name]: event.target.value });
+  const handleChange = (e) => {
+    setValues({ ...values, [e.target.name]: e.target.value });
   };
 
   const handleValidation = () => {
-    const { password, confirmPassword, username, email } = values;
+    const { username, email, password, confirmPassword } = values;
+
     if (password !== confirmPassword) {
-      toast.error(
-        "Password and confirm password should be same.",
-        toastOptions
-      );
+      toast.error("Password and confirm password should be same.", toastOptions);
       return false;
     } else if (username.length < 3) {
-      toast.error(
-        "Username should be greater than 3 characters.",
-        toastOptions
-      );
+      toast.error("Username should be greater than 3 characters.", toastOptions);
       return false;
     } else if (password.length < 8) {
-      toast.error(
-        "Password should be equal or greater than 8 characters.",
-        toastOptions
-      );
+      toast.error("Password should be equal or greater than 8 characters.", toastOptions);
       return false;
     } else if (email === "") {
       toast.error("Email is required.", toastOptions);
@@ -61,25 +54,29 @@ export default function Register() {
     return true;
   };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     if (handleValidation()) {
-      const { email, username, password } = values;
-      const { data } = await axios.post(registerRoute, {
-        username,
-        email,
-        password,
-      });
+      const { username, email, password } = values;
 
-      if (data.status === false) {
-        toast.error(data.msg, toastOptions);
-      }
-      if (data.status === true) {
-        localStorage.setItem(
-          process.env.REACT_APP_LOCALHOST_KEY,
-          JSON.stringify(data.user)
-        );
-        navigate("/");
+      try {
+        const { data } = await axios.post(registerRoute, {
+          username,
+          email,
+          password,
+        });
+
+        if (!data.status) {
+          toast.error(data.msg, toastOptions);
+        } else {
+          localStorage.setItem(
+            process.env.REACT_APP_LOCALHOST_KEY,
+            JSON.stringify(data.user)
+          );
+          navigate("/");
+        }
+      } catch (err) {
+        toast.error("Registration failed. Try again.", toastOptions);
       }
     }
   };
@@ -87,38 +84,23 @@ export default function Register() {
   return (
     <>
       <FormContainer>
-        <form action="" onSubmit={(event) => handleSubmit(event)}>
+        <form onSubmit={handleSubmit}>
           <div className="brand">
             <img src={Logo} alt="logo" />
             <h1>snappy</h1>
           </div>
-          <input
-            type="text"
-            placeholder="Username"
-            name="username"
-            onChange={(e) => handleChange(e)}
-          />
-          <input
-            type="email"
-            placeholder="Email"
-            name="email"
-            onChange={(e) => handleChange(e)}
-          />
+          <input type="text" name="username" placeholder="Username" onChange={handleChange} />
+          <input type="email" name="email" placeholder="Email" onChange={handleChange} />
+          <input type="password" name="password" placeholder="Password" onChange={handleChange} />
           <input
             type="password"
-            placeholder="Password"
-            name="password"
-            onChange={(e) => handleChange(e)}
-          />
-          <input
-            type="password"
-            placeholder="Confirm Password"
             name="confirmPassword"
-            onChange={(e) => handleChange(e)}
+            placeholder="Confirm Password"
+            onChange={handleChange}
           />
           <button type="submit">Create User</button>
           <span>
-            Already have an account ? <Link to="/login">Login.</Link>
+            Already have an account? <Link to="/login">Login.</Link>
           </span>
         </form>
       </FormContainer>
@@ -133,14 +115,13 @@ const FormContainer = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 1rem;
   align-items: center;
   background-color: #131324;
+
   .brand {
     display: flex;
     align-items: center;
     gap: 1rem;
-    justify-content: center;
     img {
       height: 5rem;
     }
@@ -158,19 +139,20 @@ const FormContainer = styled.div`
     border-radius: 2rem;
     padding: 3rem 5rem;
   }
+
   input {
     background-color: transparent;
     padding: 1rem;
     border: 0.1rem solid #4e0eff;
     border-radius: 0.4rem;
     color: white;
-    width: 100%;
     font-size: 1rem;
     &:focus {
       border: 0.1rem solid #997af0;
       outline: none;
     }
   }
+
   button {
     background-color: #4e0eff;
     color: white;
@@ -185,6 +167,7 @@ const FormContainer = styled.div`
       background-color: #4e0eff;
     }
   }
+
   span {
     color: white;
     text-transform: uppercase;
