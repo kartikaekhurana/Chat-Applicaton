@@ -34,10 +34,11 @@ const server = app.listen(process.env.PORT, () =>
 );
 const io = socket(server, {
   cors: {
-    origin: "https://chat-applicaton-u7jm-git-main-kartikae-khuranas-projects.vercel.app/",
+    origin: "https://chat-applicaton-u7jm-git-main-kartikae-khuranas-projects.vercel.app",
     credentials: true,
   },
 });
+
 
 global.onlineUsers = new Map();
 io.on("connection", (socket) => {
